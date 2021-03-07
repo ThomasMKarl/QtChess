@@ -14,44 +14,42 @@
 #include <QGraphicsPixmapItem>
 #include <QTransform>
 
-#include "include/board.h"
+#include "qtchess.h"
+
+
+class Pixel
+{
+ public:
+  Pixel() = default;
+  Pixel(int a, int b) : x(a), y(b) {};
+  int x{0};
+  int y{0};
+};
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+ public:
+  MainWindow(QWidget *parent = 0);
+  void mousePressEvent(Board &board, QMouseEvent *event);
+  void refresh(const Board& board);
 
-    void mousePressEvent(QMouseEvent *event);
-    int PixToPos(int,int);
-    int* PosToPix(int);
-    QGraphicsItem* get_item(int, int &);
-    void rem_item(QGraphicsItem*, int);
-    std::string get_field(int);
+ private:
+  bool clicked = false;
+  unsigned short int originField, destinationField;
 
-private:
-    QLabel* label;
-    bool clicked = false;
-    int field1, field2;
+  Pixel offset{20,20};
+  double fieldSize{80};
+  
+  //std::shared_ptr<QLabel> label;
+  std::shared_ptr<QGraphicsScene> scene;
 
-    double offset_x = 20;
-    double offset_y = 20;
-    double field_size = 80;
-
-    Board board;
-
-    QImage  *imageObject;
-    QTransform trafo;
-    QGraphicsScene *scene;
-
-    std::vector<QPixmap> image_wpawn;
-    std::vector<QGraphicsItem*> image_wpawn_it;
-    std::vector<QPixmap> image_wbishop;
-    std::vector<QGraphicsItem*> image_wbishop_it;
-    std::vector<QPixmap> image_bpawn;
-    std::vector<QGraphicsItem*> image_bpawn_it;
+  QTransform trafo;
 };
+
+unsigned short int PixToPos(Pixel &pixel, Pixel &offset, double fieldSize);
+Pixel PosToPix(unsigned short int position, Pixel &offset, double fieldSize);
+std::string getFieldName(unsigned short int position);
 
 #endif // MAINWINDOW_H

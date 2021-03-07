@@ -1,4 +1,6 @@
-QtChess
+bin/*
+doc/html
+doc/latex
 *~
 *#
-Makefile
+include/mpark

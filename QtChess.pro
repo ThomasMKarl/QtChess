@@ -8,26 +8,27 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = QtChess
+TARGET = qtchess
 TEMPLATE = app
-CONFIG += c++17 O3 Wall Wextra
+QMAKE_CXXFLAGS += -std=c++17 -O3 -I include -pthread -Wl,-rpath -Wl,/usr/lib/openmpi -Wl,--enable-new-dtags
+QMAKE_LIBS += -L/usr/lib/openmpi -lmpi_cxx -lmpi
 
-SOURCES +=  main.cpp           \
+SOURCES +=  qt.cpp           \
             src/mainwindow.cpp \
             src/board.cpp      \
-            src/pawn.cpp       \
-            src/knight.cpp     \
-            src/bishop.cpp     \
-            src/rook.cpp       \
-            src/queen.cpp      \
-            src/king.cpp       \
+            src/piece/pawn.cpp       \
+            src/piece/knight.cpp     \
+            src/piece/bishop.cpp     \
+            src/piece/rook.cpp       \
+            src/piece/queen.cpp      \
+            src/piece/king.cpp       \
 
 HEADERS  += include/mainwindow.h \
             include/board.h      \        
-            include/piece.h      \
-            include/pawn.h       \
-            include/knight.h     \
-            include/bishop.h     \
-            include/rook.h       \
-            include/queen.h      \
-            include/king.h       \
+            include/piece/piece.h      \
+            include/piece/pawn.h       \
+            include/piece/knight.h     \
+            include/piece/bishop.h     \
+            include/piece/rook.h       \
+            include/piece/queen.h      \
+            include/piece/king.h       \
