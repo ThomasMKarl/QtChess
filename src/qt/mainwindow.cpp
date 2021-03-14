@@ -1,13 +1,13 @@
-#include "mainwindow.h"
+#include "qt/mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+qtc::qt::MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {  
   Board board = Board::newgame();
   
   setWindowTitle("QtChess Board");
 
   scene = std::make_shared<QGraphicsScene>(this);
-  QPen blackPen("black");
+  const QPen blackPen("black");
   QBrush blackBrush("black");
   QBrush whiteBrush("white");
     
@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
   refresh(board);
 }
 
-void MainWindow::refresh(const Board &board)
+void qtc::qt::MainWindow::refresh(const Board &board)
 {
   Pixel coordinate{};
   std::unique_ptr<QImage> imageObject = std::make_unique<QImage>();
@@ -53,9 +53,9 @@ void MainWindow::refresh(const Board &board)
   setCentralWidget(&view);
 }
 
-void MainWindow::mousePressEvent(Board &board, QMouseEvent *event)
+void qtc::qt::MainWindow::mousePressEvent(Board &board, const QMouseEvent *event)
 {
-  Pixel clickedCoordinate{event->x(),event->y()};
+  const Pixel clickedCoordinate{event->x(),event->y()};
 
   trafo = QTransform();
 
@@ -84,14 +84,14 @@ void MainWindow::mousePressEvent(Board &board, QMouseEvent *event)
     std::cout << "-" << getFieldName(destinationField) << "\n";
 
     originFieldString += destinationFieldString;
-    ::move(board, originFieldString);
+    qtc::move(board, originFieldString);
     refresh(board);
   }
 }
 
-unsigned short int PixToPos(Pixel &pixel, Pixel &offset, double fieldSize)
+unsigned short int qtc::qt::PixToPos(const Pixel &pixel, const Pixel &offset, const double fieldSize)
 {
-    for(int i = 0; i < 64; i++)
+    for(unsigned short int i = 0; i < 64; i++)
     {
       if((pixel.x > offset.x + i%8*fieldSize &&
 	  pixel.x < offset.x + (i%8+1)*fieldSize) &&
@@ -102,17 +102,17 @@ unsigned short int PixToPos(Pixel &pixel, Pixel &offset, double fieldSize)
     return 64;
 }
 
-Pixel PosToPix(unsigned short int position, Pixel &offset, double fieldSize)
+qtc::qt::Pixel qtc::qt::PosToPix(const unsigned short int position, const Pixel &offset, const double fieldSize)
 {
-    Pixel pixel;
+  qtc::qt::Pixel pixel;
 
-    pixel.x = offset.x + (position%8*4+1)*fieldSize/4;
-    pixel.y = offset.y + (position/8*4+1)*fieldSize/4;
+  pixel.x = offset.x + (position%8*4+1)*fieldSize/4;
+  pixel.y = offset.y + (position/8*4+1)*fieldSize/4;
 
-    return pixel;
+  return pixel;
 }
 
-std::string getFieldName(unsigned short int pos)
+std::string qtc::qt::getFieldName(const unsigned short int position)
 {
-  return fieldMap.at(pos);
+  return fieldMap.at(position);
 }

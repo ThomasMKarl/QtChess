@@ -1,5 +1,7 @@
 #include "qtchess.h"
 
+using namespace qtc;
+
 int main()
 {
   Board board = Board::newgame();
@@ -38,7 +40,7 @@ int main()
     {
       move(board,desiredMove);
     }
-    }*/
+  }*/
   
   return EXIT_SUCCESS;
 }

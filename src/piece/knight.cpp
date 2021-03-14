@@ -1,7 +1,7 @@
 #include "piece/knight.h"
 
-  Knight::Knight(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite)
+  qtc::pc::Knight::Knight(Board &game, const unsigned short int position, const bool isWhite)
+    : Piece(position, isWhite)
   {
     setNewPosition(game, game.knightPositions);
     
@@ -11,9 +11,9 @@
       pathToImage = "img/bknight.png";
   }
   
-  void Knight::movegen(Board &game)
+  void qtc::pc::Knight::movegen(const Board &game)
   {
-    unsigned short int position = log2(mPosition);
+    const unsigned short int position = log2(mPosition);
 
     unsigned long long int sameColorPositions;
     if(mWhite)
@@ -26,11 +26,11 @@
     removeIllegalMoves(game);
   }
   
-  void Knight::move(Board &game, std::string desiredMove)
+  void qtc::pc::Knight::move(Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
 
     if(isImpossible(binaryMove))
     {

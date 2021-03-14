@@ -1,9 +1,12 @@
 #ifndef PAWN_H
 #define PAWN_H
 
-#include "board.h"
+#include "board/board.h"
 #include "piece/piece.h"
 
+
+namespace qtc {
+namespace pc {
 
 enum PromotionPiece
 {
@@ -17,12 +20,12 @@ enum PromotionPiece
 class Pawn: public Piece
 {
  public:
-  explicit Pawn(Board &game, unsigned short int position, bool isWhite);
+  explicit Pawn(Board &game, const unsigned short int position, const bool isWhite);
 
-  void movegen(Board &game) final;
+  void movegen(const Board &game) final;
   void move(Board &game, std::string desiredMove) final;
-  void promote(Board &game, PromotionPiece promoteTo);
-  void removeEpPawn(Board &game, unsigned short int numberMove);
+  void promote(Board &game, const PromotionPiece promoteTo);
+  void removeEpPawn(Board &game, const unsigned short int numberMove);
   void setCanHitEpLeft()  final {canHitEpLeft  = true;}
   void setCanHitEpRight() final {canHitEpRight = true;}
   
@@ -30,7 +33,8 @@ class Pawn: public Piece
   bool hasMoved{false};
   bool canHitEpLeft{false};
   bool canHitEpRight{false};
-  
 };
+
+};};
 
 #endif

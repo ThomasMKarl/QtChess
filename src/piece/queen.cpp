@@ -1,7 +1,7 @@
 #include "piece/queen.h"
 
-  Queen::Queen(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite)
+  qtc::pc::Queen::Queen(Board &game, const unsigned short int position, const bool isWhite)
+    : Piece(position, isWhite)
   {
     setNewPosition(game, game.queenPositions);
     
@@ -11,9 +11,9 @@
       pathToImage = "img/bqueen.png";
   }
   
-  void Queen::movegen(Board &game)
+  void qtc::pc::Queen::movegen(const Board &game)
   {
-    unsigned short int position = log2(mPosition);
+    const unsigned short int position = log2(mPosition);
     mPossibleMoves = 0;
     
     //////////////////////////Bishop moves
@@ -77,11 +77,11 @@
     removeIllegalMoves(game);
   };
 
-  void Queen::move(Board &game, std::string desiredMove)
+  void qtc::pc::Queen::move(Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
 
     if(isImpossible(binaryMove))
     {

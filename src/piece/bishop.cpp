@@ -1,7 +1,9 @@
 #include "piece/bishop.h"
 
-  Bishop::Bishop(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite)
+  qtc::pc::Bishop::Bishop(qtc::Board &game,
+			  const unsigned short int position,
+			  const bool isWhite)
+    : Piece(position, isWhite)
   { 
     setNewPosition(game, game.bishopPositions);
     
@@ -11,9 +13,9 @@
       pathToImage = "img/bbishop.png";
   }
 
-  void Bishop::movegen(Board &game)
+  void qtc::pc::Bishop::movegen(const qtc::Board &game)
   {
-    unsigned short int position = log2(mPosition);
+    const unsigned short int position = log2(mPosition);
     mPossibleMoves = 0;
     
     unsigned long long int upperLeftStep;
@@ -47,11 +49,11 @@
     removeIllegalMoves(game);
   }
 
-  void Bishop::move(Board &game, std::string desiredMove)
+  void qtc::pc::Bishop::move(qtc::Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
 
     if(isImpossible(binaryMove))
     {

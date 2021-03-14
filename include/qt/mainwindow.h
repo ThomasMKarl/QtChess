@@ -16,6 +16,8 @@
 
 #include "qtchess.h"
 
+namespace qtc {
+namespace qt {
 
 class Pixel
 {
@@ -32,7 +34,7 @@ class MainWindow : public QMainWindow
 
  public:
   MainWindow(QWidget *parent = 0);
-  void mousePressEvent(Board &board, QMouseEvent *event);
+  void mousePressEvent(Board &board, const QMouseEvent *event);
   void refresh(const Board& board);
 
  private:
@@ -48,8 +50,10 @@ class MainWindow : public QMainWindow
   QTransform trafo;
 };
 
-unsigned short int PixToPos(Pixel &pixel, Pixel &offset, double fieldSize);
-Pixel PosToPix(unsigned short int position, Pixel &offset, double fieldSize);
-std::string getFieldName(unsigned short int position);
+unsigned short int PixToPos(const Pixel &pixel, const Pixel &offset, const double fieldSize);
+Pixel PosToPix(const unsigned short int position, const Pixel &offset, const double fieldSize);
+std::string getFieldName(const unsigned short int position);
+
+};};
 
 #endif // MAINWINDOW_H

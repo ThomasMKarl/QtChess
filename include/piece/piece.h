@@ -1,27 +1,72 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include "board.h"
+#include "board/board.h"
 
 
+namespace qtc {
+
+struct MoveGenerator
+{
+  MoveGenerator(const Board& board) {boardResource = std::make_shared<Board>(board);}
+
+  template<typename T>
+  void operator()(const T& piece) const {piece.movegen();}
+
+ private:
+  std::shared_ptr<Board> boardResource{};
+};
+
+struct Move
+{
+  Move(const Board& board) {boardResource = std::make_shared<Board>(board);}
+
+  void setDesiredMove(std::string move) {move_ = move;}
+  
+  template<typename T>
+  void operator()(const T& piece) const {piece.move(move_);}
+
+ private:
+  std::shared_ptr<Board> boardResource{};
+  std::string move_{};
+};
+
+
+namespace pc {
+    
 class Piece
 {
  public:
-  explicit Piece(unsigned short int position, bool isWhite)
-  : mPosition(1ULL << position), mWhite(isWhite) {};
+  explicit Piece(const unsigned short int position, const bool isWhite)
+    : mPosition(1ULL << position), mWhite(isWhite) {};
   
   virtual ~Piece(){};
-  virtual void movegen(Board&) {};
+  virtual void movegen(const Board&) {};
   virtual void move(Board&, std::string) {};
   
   unsigned short int getPosition() const {return log2(mPosition);}
-  void setPosition(unsigned short int position) {mPosition = pow2(position);}
+  void setPosition(const unsigned short int position) {mPosition = pow2(position);}
   unsigned long long int getPossibleMoves() const {return mPossibleMoves;}
   bool isWhite() const {return mWhite;}
   virtual void setCanHitEpLeft()  {};
   virtual void setCanHitEpRight() {};
+  
+  std::vector<std::string> computePossibleMoves() const
+  {
+    const std::bitset<sizeof(unsigned long long int) * CHAR_BIT>
+      bit(mPossibleMoves);
+    
+    std::vector<std::string> moves{};
+    for(unsigned short int b = 0; b < 64; b++)
+    {
+      if(bit[b] == 1)
+	moves.push_back( fieldMap[log2(mPosition)] + fieldMap[b] );
+    }
 
-  bool isImpossible(unsigned long long int move)
+    return moves;
+  }
+  
+  bool isImpossible(const unsigned long long int move)
   {
     return !(move & mPossibleMoves);
   }
@@ -65,12 +110,12 @@ class Piece
     game.blackPositions  &= ~mPosition;
   }
 
-  bool shiftMovesBlocked(Board &game, unsigned long long int shift)
+  bool shiftMovesBlocked(const Board &game, const unsigned long long int shift)
   {
-    if(mWhite && (shift & game.whitePositions) != 0)
+    if( mWhite && (shift & game.whitePositions) != 0)
       return true;
       
-    if(mWhite && (shift & game.blackPositions) != 0)
+    if( mWhite && (shift & game.blackPositions) != 0)
     {
       mPossibleMoves |= shift;
       return true;
@@ -89,9 +134,9 @@ class Piece
     return false;
   }
 
-  void correctPiecePosition(Board &game, unsigned short int newPosition)
+  void correctPiecePosition(Board &game, const unsigned short int newPosition)
   {
-    short int oldPosition = log2(mPosition);
+    const short int oldPosition = log2(mPosition);
     
     game.pieces.erase(newPosition);
     
@@ -100,10 +145,12 @@ class Piece
     game.pieces.insert(std::move(extractedPiece));
   }
 
-  void removeIllegalMoves(Board &game)
+  void removeIllegalMoves(const Board &game)
   {
     std::bitset<sizeof(unsigned long long int) * CHAR_BIT> bit(mPossibleMoves);
     unsigned long long int threatenedFields;
+
+    //Move move{game};
 
     for(unsigned short int b = 0; b < 64; b++)
     {
@@ -111,9 +158,12 @@ class Piece
       {
 	Board gameCopy = game;
         gameCopy.pieces.at( log2(mPosition) ) ->move( gameCopy,fieldMap[b] );
+	//move.setDesiredMove(fieldMap[b]);
+	//mpark::visit(move, gameCopy.pieces.at( log2(mPosition) ));
         if(mWhite)
 	{
-	  threatenedFields = gameCopy.generateBlackMoves();
+	  threatenedFields =
+	    computeThreatenedFields(gameCopy.generateBlackMoves());
 	  if(threatenedFields &
 	     gameCopy.kingPositions &
 	     gameCopy.whitePositions)
@@ -121,7 +171,8 @@ class Piece
 	}
         else
 	{
-	  threatenedFields = gameCopy.generateWhiteMoves();
+	  threatenedFields =
+	    computeThreatenedFields(gameCopy.generateWhiteMoves());
 	  if(threatenedFields &
 	     gameCopy.kingPositions &
 	     gameCopy.blackPositions)
@@ -133,5 +184,7 @@ class Piece
     mPossibleMoves = bit.to_ullong();
   }
 };
+
+};};
 
 #endif

@@ -1,7 +1,7 @@
 #include "piece/rook.h"
 
-  Rook::Rook(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite)
+  qtc::pc::Rook::Rook(Board &game, const unsigned short int position, const bool isWhite)
+    : Piece(position, isWhite)
   {
     setNewPosition(game, game.rookPositions);
     
@@ -11,9 +11,9 @@
       pathToImage = "img/brook.png";
   };
 
-  void Rook::movegen(Board &game)
+  void qtc::pc::Rook::movegen(const Board &game)
   {    
-    unsigned short int position = log2(mPosition);
+    const unsigned short int position = log2(mPosition);
 
     unsigned long long int upperStep;
     for(unsigned short int i = 0; i < rookMoveTable.upper[position]; i++)
@@ -47,11 +47,11 @@
     removeIllegalMoves(game);
   }
 
-  void Rook::move(Board &game, std::string desiredMove)
+  void qtc::pc::Rook::move(Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
     
     if(isImpossible(binaryMove))
     {
@@ -59,7 +59,7 @@
       return;
     }
 
-    unsigned short int oldPosition = log2(mPosition);
+    const unsigned short int oldPosition = log2(mPosition);
     if(oldPosition == h1) game.whiteCanCastleShort = false;
     if(oldPosition == a1) game.whiteCanCastleLong  = false;
     if(oldPosition == h8) game.blackCanCastleShort = false;

@@ -1,7 +1,7 @@
 #include "piece/king.h"
 
-  King::King(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite)
+  qtc::pc::King::King(Board &game, const unsigned short int position, const bool isWhite)
+    : Piece(position, isWhite)
   {
     setNewPosition(game, game.kingPositions);
     
@@ -11,16 +11,17 @@
       pathToImage = "img/bking.png";
   }
   
-  void King::movegen(Board &game)
+  void qtc::pc::King::movegen(const Board &game)
   {
-    unsigned short int position = log2(mPosition);
+    const unsigned short int position = log2(mPosition);
     
     if(mWhite)
       mPossibleMoves |= pow2(kingMoveTable[position]) | game.whitePositions;
     else
       mPossibleMoves |= pow2(kingMoveTable[position]) | game.blackPositions;
 
-    unsigned long long int allPositions = game.whitePositions | game.blackPositions;
+    const unsigned long long int allPositions =
+      game.whitePositions | game.blackPositions;
     
     if(mWhite  && game.whiteCanCastleShort &&
        (0b110 & allPositions) &&
@@ -49,11 +50,11 @@
     removeIllegalMoves(game);
   }
   
-  void King::move(Board &game, std::string desiredMove)
+  void qtc::pc::King::move(Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
     
     if(mWhite)
     {
@@ -86,7 +87,7 @@
     game.whiteToMove = !game.whiteToMove;
   }
 
-  void King::correctRook(Board &game, unsigned short int numberMove)
+  void qtc::pc::King::correctRook(Board &game, const unsigned short int numberMove)
   {
     if(numberMove == g1)
     {

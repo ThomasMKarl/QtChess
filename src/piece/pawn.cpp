@@ -1,7 +1,7 @@
 #include "piece/pawn.h"
 
-  Pawn::Pawn(Board &game, unsigned short int position, bool isWhite)
-  : Piece(position, isWhite), hasMoved(false), canHitEpLeft(false), canHitEpRight(false)
+  qtc::pc::Pawn::Pawn(Board &game, const unsigned short int position, const bool isWhite)
+    : Piece(position, isWhite), hasMoved(false), canHitEpLeft(false), canHitEpRight(false)
   {
     setNewPosition(game, game.pawnPositions);
     
@@ -11,12 +11,12 @@
       pathToImage = "img/bpawn.png";
   }
 
-  void Pawn::movegen(Board &game)
+  void qtc::pc::Pawn::movegen(const Board &game)
   {
     unsigned long long int hit{0};
     unsigned long long int onestep{0};
     unsigned long long int doublestep{0};
-    unsigned long long int allPositions =
+    const unsigned long long int allPositions =
       game.blackPositions | game.whitePositions;
 
     std::bitset<64> pawnBits(allPositions);
@@ -67,11 +67,11 @@
     removeIllegalMoves(game);
   }
 
-  void Pawn::move(Board &game, std::string desiredMove)
+  void qtc::pc::Pawn::move(Board &game, std::string desiredMove)
   {
-    unsigned short int numberMove =
+    const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove = binaryField[numberMove];
     
     if(isImpossible(binaryMove))
     {
@@ -79,7 +79,7 @@
       return;
     }
 
-    unsigned short int oldPosition = log2(mPosition);
+    const unsigned short int oldPosition = log2(mPosition);
     if( abs(numberMove-oldPosition) == 16)
     {
       if(game.pawnPositions & binaryField[numberMove+1])
@@ -89,7 +89,7 @@
     } 
     
     PromotionPiece promoteTo = none;
-    unsigned short int offboard = 64;
+    const unsigned short int offboard = 64;
     if(numberMove >= h8 || numberMove <= a1) switch(desiredMove[2])
     {
       case 'N':
@@ -109,8 +109,9 @@
 	promoteTo =   rook;
 	break;
       default:
-	std::cerr << "impossible move!" << std::endl;
-        return;
+	game.createPiece<Queen >(offboard, mWhite);
+	promoteTo =  queen;
+	break;
     }
        
     deletePiece(game, game.pawnPositions);
@@ -132,7 +133,7 @@
       setNewPosition(game, game.pawnPositions);   
   }
 
-  void Pawn::promote(Board &game, PromotionPiece promoteTo)
+  void qtc::pc::Pawn::promote(Board &game, const PromotionPiece promoteTo)
   {
     switch(promoteTo)
     {
@@ -153,9 +154,9 @@
         return;
     }
 	
-    unsigned short int position = log2(mPosition);
-    unsigned short int offboard = 64;
-    auto extractedPawn        = game.pieces.extract(position);
+    const unsigned short int position = log2(mPosition);
+    const unsigned short int offboard = 64;
+    const auto extractedPawn  = game.pieces.extract(position);
     auto pieceAfterPromotions = game.pieces.extract(offboard);
     
     pieceAfterPromotions.key() = position;
@@ -167,12 +168,12 @@
       game.blackPositions |= mPosition;
   }
 
-  void Pawn::removeEpPawn(Board &game, unsigned short int numberMove)
+  void qtc::pc::Pawn::removeEpPawn(Board &game, const unsigned short int numberMove)
   {
-    unsigned short int oldPosition = log2(mPosition);
+    const unsigned short int oldPosition = log2(mPosition);
     
-    unsigned long long int binaryMove = binaryField[numberMove];
-    unsigned long long int allPositions =
+    const unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int allPositions =
       game.blackPositions | game.whitePositions;
     
     if( abs(numberMove-oldPosition) == 7 && (allPositions | binaryMove) )

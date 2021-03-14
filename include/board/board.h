@@ -5,27 +5,32 @@
 #include "stdlib.h"
 #include "def.h"
 
-unsigned long long int pow2(unsigned short int);
+namespace qtc {
+
+unsigned long long int pow2(const unsigned short int);
 std::vector<std::string> explode(std::string string,
 				 const std::string delimiter = " ");
-bool kingPositionsCorrect(unsigned short int whiteKingPosition,
-			  unsigned short int blackKingPosition);
-std::string receiveFENfromNode(int source = 0,
-			       MPI_Comm communicator = MPI_COMM_WORLD);
-void FENerror(short int errorCode,
-	      MPI_Comm communicator = MPI_COMM_WORLD);
+bool kingPositionsCorrect(const unsigned short int whiteKingPosition,
+			  const unsigned short int blackKingPosition);
+unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);
+std::string receiveFENfromNode(const int source = 0,
+			       const MPI_Comm communicator = MPI_COMM_WORLD);
+void FENerror(const short int errorCode,
+	      const MPI_Comm communicator = MPI_COMM_WORLD);
+unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);
 
-
+namespace pc {
 class Piece;
-using Pieces = std::map<unsigned short int, std::shared_ptr<Piece>>;
-//using Piece = mpark::variant<Pawn,Knight,Bishop,Rook,Queen>;
-//using Pieces = std::map<unsigned short int, Piece>;
 class Pawn;
 class Knight;
 class Bishop;
 class Queen;
 class King;
 class Rook;
+};
+using Pieces = std::map<unsigned short int, std::shared_ptr<pc::Piece>>;
+//using Piece = mpark::variant<Pawn,Knight,Bishop,Rook,Queen,King>;
+//using Pieces = std::map<unsigned short int, Piece>;
 
 class Board
 {
@@ -33,40 +38,40 @@ class Board
   
   explicit Board()
   {
-    bool black = false;
+    const bool black = false;
 
     for(unsigned short int field = h7; field <= a7; field++)
-      createPiece<Pawn>(field, black);
+      createPiece<pc::Pawn>(field, black);
     
-    createPiece<Rook  >(h8, black);
-    createPiece<Knight>(g8, black);
-    createPiece<Bishop>(f8, black);
-    createPiece<King  >(e8, black);
-    createPiece<Queen >(d8, black);
-    createPiece<Bishop>(c8, black);
-    createPiece<Knight>(b8, black);
-    createPiece<Rook  >(a8, black);
+    createPiece<pc::Rook  >(h8, black);
+    createPiece<pc::Knight>(g8, black);
+    createPiece<pc::Bishop>(f8, black);
+    createPiece<pc::King  >(e8, black);
+    createPiece<pc::Queen >(d8, black);
+    createPiece<pc::Bishop>(c8, black);
+    createPiece<pc::Knight>(b8, black);
+    createPiece<pc::Rook  >(a8, black);
   
     //////////////////////////////////////////////////
     
-    bool white = true;
+    const bool white = true;
   
     for(unsigned short int field = h2; field <= a2; field++)
-      createPiece<Pawn>(field, white);
+      createPiece<pc::Pawn>(field, white);
   
-    createPiece<Rook  >(h1, white);
-    createPiece<Knight>(g1, white);
-    createPiece<Bishop>(f1, white);
-    createPiece<King  >(e1, white);
-    createPiece<Queen >(d1, white);
-    createPiece<Bishop>(c1, white);
-    createPiece<Knight>(b1, white);
-    createPiece<Rook  >(a1, white);
+    createPiece<pc::Rook  >(h1, white);
+    createPiece<pc::Knight>(g1, white);
+    createPiece<pc::Bishop>(f1, white);
+    createPiece<pc::King  >(e1, white);
+    createPiece<pc::Queen >(d1, white);
+    createPiece<pc::Bishop>(c1, white);
+    createPiece<pc::Knight>(b1, white);
+    createPiece<pc::Rook  >(a1, white);
   };
 
   explicit Board(std::string FENposition)
   {
-    std::vector<std::string> FENsections
+    const std::vector<std::string> FENsections
       = explode(std::move(FENposition));
     if(FENsections.size() != 6) FENerror(-1);
 
@@ -80,7 +85,7 @@ class Board
 
     char character[] = {FENsections[4].at(0)};
     movesSinceHit = atoi(character);
-    if(movesSinceHit >= 50) exit(0);
+    if(movesSinceHit >= 50) FENerror(-1);
     
     character[0] = {FENsections[5].at(0)};
     moveCounter  = atoi(character) - 1;
@@ -89,13 +94,13 @@ class Board
 
     if(whiteToMove)
     {
-      threatenedFields = generateWhiteMoves();
+      threatenedFields = computeThreatenedFields(generateWhiteMoves());
       if(threatenedFields & kingPositions & blackPositions)
 	FENerror(-1);
     }
     else
     {
-      threatenedFields = generateBlackMoves();
+      threatenedFields = computeThreatenedFields(generateBlackMoves());
       if(threatenedFields & kingPositions & blackPositions)
 	FENerror(-1);
     }
@@ -108,9 +113,9 @@ class Board
     Board game{};
 
     if(game.whiteToMove)
-      game.threatenedFields = game.generateBlackMoves();
+      game.threatenedFields = computeThreatenedFields(game.generateBlackMoves());
     else
-      game.threatenedFields = game.generateWhiteMoves();
+      game.threatenedFields = computeThreatenedFields(game.generateWhiteMoves());
 
     return game;
   }
@@ -120,15 +125,15 @@ class Board
     Board game{std::move(FENposition)};
     
     if(game.whiteToMove)
-      game.threatenedFields = game.generateBlackMoves();
+      game.threatenedFields = computeThreatenedFields(game.generateBlackMoves());
     else
-      game.threatenedFields = game.generateWhiteMoves();
+      game.threatenedFields = computeThreatenedFields(game.generateWhiteMoves());
 
     return game;
   }
 
-  static Board createBoardFromNode(int source = 0,
-				   MPI_Comm communicator = MPI_COMM_WORLD)
+  static Board createBoardFromNode(const int source = 0,
+				   const MPI_Comm communicator = MPI_COMM_WORLD)
   { 
     return createBoardFromFEN(
      receiveFENfromNode(source, communicator)
@@ -143,21 +148,20 @@ class Board
   void printPositionsBinary() const;
   bool positionsMatchWithPieces() const;
   
-  unsigned long long int generateWhiteMoves();
-  unsigned long long int generateBlackMoves();
-  unsigned long long int computeThreatenedFields();
+  std::vector<std::string> generateWhiteMoves();
+  std::vector<std::string> generateBlackMoves();
   
-  void update();
+  std::vector<std::string> update();
   
   short int createPiecesFromFEN(std::string FENsection);
   short int setMoveRightFromFEN(std::string FENsection);
   short int   setRochadeFromFEN(std::string FENsection);
-  void             setEpFromFEN(std::string FENsection);
-  std::string computePiecesFEN();
-  std::string computeFENposition();
-  MPI_Request sendFENtoNode(int destination,
-			    MPI_Comm communicator = MPI_COMM_WORLD);
-
+  void             setEpFromFEN(std::string FENsection) const;
+  std::string computePiecesFEN() const ;
+  std::string computeFENposition() const;
+  MPI_Request sendFENtoNode(const int destination,
+			    const MPI_Comm communicator = MPI_COMM_WORLD) const;
+  
   bool whiteToMove{true};
 
   bool whiteCanCastleShort{true};
@@ -190,11 +194,16 @@ class Board
   Pieces pieces{};
 };
 
-unsigned short int getOriginFieldNumber(std::string &move);
-unsigned long long int convertStringToBinaryPosition(std::string &move);
-unsigned short int convertStringToPosition(std::string &move);
-void move(Board &game, std::string &desiredMove);
+unsigned short int getOriginFieldNumber(std::string move);
+unsigned long long int convertStringToBinaryPosition(std::string move);
+unsigned short int convertStringToPosition(std::string move);
+void move(Board &game, std::string desiredMove);
 bool isMate(Board &game);
 bool isStalemate(Board &game);
+
+unsigned short int playRandom(Board game);
+float computeWinProbability(const Board &game, const unsigned long long int numberOfGames);
+
+};
 
 #endif
