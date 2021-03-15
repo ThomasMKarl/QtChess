@@ -1,9 +1,11 @@
-#include "piece/knight.h"
+#include "pieces.h"
+#include "board/board.h"
+#include "piece/static.h"
 
   qtc::pc::Knight::Knight(Board &game, const unsigned short int position, const bool isWhite)
-    : Piece(position, isWhite)
+    : mPosition(1ULL << position), mWhite(isWhite)
   {
-    setNewPosition(game, game.knightPositions);
+    setNewPosition(*this, game, game.knightPositions);
     
     if(mWhite)
       pathToImage = "img/wknight.png";
@@ -15,37 +17,38 @@
   {
     const unsigned short int position = log2(mPosition);
 
-    unsigned long long int sameColorPositions;
+    unsigned long long int allPositions;
     if(mWhite)
-      sameColorPositions = game.whitePositions;
+      allPositions = game.whitePositions;
     else
-      sameColorPositions = game.blackPositions;
+      allPositions = game.blackPositions;
     
-    mPossibleMoves |= pow2(knightMoveTable[position]) | !sameColorPositions;
+    mPossibleMoves |= pow2(knightMoveTable[position]) | !allPositions;
 
-    removeIllegalMoves(game);
+    removeIllegalMoves(*this, game);
   }
   
   void qtc::pc::Knight::move(Board &game, std::string desiredMove)
   {
     const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    const unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove =
+      binaryField[numberMove];
 
-    if(isImpossible(binaryMove))
+    if(isImpossible(*this, binaryMove))
     {
       std::cerr << "impossible move!" << std::endl;
       return;
     }
     
-    deletePiece(game, game.knightPositions);   
+    deletePiece(*this, game, game.knightPositions);   
 
-    correctPiecePosition(game, numberMove);
+    correctPiecePosition(*this, game, numberMove);
     
     mPosition = binaryMove;
-    setNewPosition(game, game.knightPositions);
+    setNewPosition(*this, game, game.knightPositions);
 
-    deletePieceFromHitPosition(game);
+    deletePieceFromHitPosition(*this, game);
 
     game.whiteToMove = !game.whiteToMove;
   }

@@ -19,6 +19,22 @@
 namespace qtc {
 namespace qt {
 
+std::array<std::string,12> pieceImages = {
+  "img/bbishop.png",
+  "img/bking.png",
+  "img/bknight.png",
+  "img/bpawn.png",
+  "img/bqueen.png",
+  "img/brook.png",
+
+  "img/wbishop.png",
+  "img/wking.png",
+  "img/wknight.png",
+  "img/wpawn.png",
+  "img/wqueen.png",
+  "img/wrook.png"
+};
+  
 class Pixel
 {
  public:

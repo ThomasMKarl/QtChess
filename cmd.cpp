@@ -2,12 +2,15 @@
 
 using namespace qtc;
 
-int main()
+int main(int argc, char* argv[])
 {
-  Board board = Board::newgame();
+  if(argc > 2) std::cerr << "Usage: " << argv[0] << " \"<FEN String>\"\n";
+
+  if(argc = 2) Board board = Board::createBoardFromFEN(argv[1]);
+  else         Board board = Board::newgame();
   
-  /*while(true)
-  {
+  while(true)
+  {/*
     std::cout << "         ## Position after "
 	      << board.moveCounter << " moves ##\n";
     
@@ -39,8 +42,8 @@ int main()
     else
     {
       move(board,desiredMove);
-    }
-  }*/
+    }*/
+  }
   
   return EXIT_SUCCESS;
 }

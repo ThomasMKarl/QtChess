@@ -1,9 +1,15 @@
-#include "piece/pawn.h"
+#include "pieces.h"
+#include "board/board.h"
+#include "piece/static.h"
 
   qtc::pc::Pawn::Pawn(Board &game, const unsigned short int position, const bool isWhite)
-    : Piece(position, isWhite), hasMoved(false), canHitEpLeft(false), canHitEpRight(false)
+    : mPosition(1ULL << position),
+      mWhite(isWhite),
+      hasMoved(false),
+      canHitEpLeft(false),
+      canHitEpRight(false)
   {
-    setNewPosition(game, game.pawnPositions);
+    setNewPosition(*this, game, game.pawnPositions);
     
     if(mWhite)
       pathToImage = "img/wpawn.png";
@@ -19,8 +25,8 @@
     const unsigned long long int allPositions =
       game.blackPositions | game.whitePositions;
 
-    std::bitset<64> pawnBits(allPositions);
-    std::cout << pawnBits;exit(1);
+    //std::bitset<64> pawnBits(allPositions);
+    //std::cout << pawnBits;exit(1);
 	  
     if(mWhite)
     {
@@ -64,16 +70,17 @@
     canHitEpLeft  = false;
     canHitEpRight = false;
 
-    removeIllegalMoves(game);
+    removeIllegalMoves(*this, game);
   }
 
   void qtc::pc::Pawn::move(Board &game, std::string desiredMove)
   {
     const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    const unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove =
+      binaryField[numberMove];
     
-    if(isImpossible(binaryMove))
+    if(isImpossible(*this, binaryMove))
     {
       std::cerr << "impossible move!" << std::endl;
       return;
@@ -83,9 +90,9 @@
     if( abs(numberMove-oldPosition) == 16)
     {
       if(game.pawnPositions & binaryField[numberMove+1])
-	game.pieces.at(numberMove+1)->setCanHitEpLeft();
+	mpark::get<Pawn>(game.pieces.at(numberMove+1)).setCanHitEpLeft();
       if(game.pawnPositions & binaryField[numberMove-1])
-        game.pieces.at(numberMove-1)->setCanHitEpRight();
+        mpark::get<Pawn>(game.pieces.at(numberMove-1)).setCanHitEpRight();
     } 
     
     PromotionPiece promoteTo = none;
@@ -114,15 +121,15 @@
 	break;
     }
        
-    deletePiece(game, game.pawnPositions);
+    deletePiece(*this, game, game.pawnPositions);
 
     removeEpPawn(game, numberMove);
 
-    correctPiecePosition(game, numberMove);
+    correctPiecePosition(*this, game, numberMove);
     
     mPosition = binaryMove;
 
-    deletePieceFromHitPosition(game);
+    deletePieceFromHitPosition(*this, game);
 
     hasMoved = true;
     game.whiteToMove = !game.whiteToMove;
@@ -130,7 +137,7 @@
     if(promoteTo != none)
       promote(game, promoteTo);
     else
-      setNewPosition(game, game.pawnPositions);   
+      setNewPosition(*this, game, game.pawnPositions);   
   }
 
   void qtc::pc::Pawn::promote(Board &game, const PromotionPiece promoteTo)
@@ -138,16 +145,16 @@
     switch(promoteTo)
     {
       case knight:
-	setNewPosition(game, game.knightPositions); 
+	setNewPosition(*this, game, game.knightPositions); 
 	break;
       case bishop:
-	setNewPosition(game, game.bishopPositions);
+	setNewPosition(*this, game, game.bishopPositions);
 	break;
       case queen:
-	setNewPosition(game, game.queenPositions );
+	setNewPosition(*this, game, game.queenPositions );
 	break;
       case rook:
-	setNewPosition(game, game.rookPositions  );
+	setNewPosition(*this, game, game.rookPositions  );
 	break;
       default:
 	std::cerr << "could not promote!";
@@ -171,24 +178,26 @@
   void qtc::pc::Pawn::removeEpPawn(Board &game, const unsigned short int numberMove)
   {
     const unsigned short int oldPosition = log2(mPosition);
-    
     const unsigned long long int binaryMove = binaryField[numberMove];
+    
     const unsigned long long int allPositions =
       game.blackPositions | game.whitePositions;
     
-    if( abs(numberMove-oldPosition) == 7 && (allPositions | binaryMove) )
+    if( abs(numberMove-oldPosition) == 7
+	&& (allPositions | binaryMove) )
     {
       game.pieces.erase(numberMove-1);
 
       mPosition = numberMove-1;
-      deletePieceFromHitPosition(game);
+      deletePieceFromHitPosition(*this, game);
     }
-    if( abs(numberMove-oldPosition) == 9 && (allPositions | binaryMove) )
+    if( abs(numberMove-oldPosition) == 9
+        && (allPositions | binaryMove) )
     {
       game.pieces.erase(numberMove+1);
       
       mPosition = numberMove+1;
-      deletePieceFromHitPosition(game);
+      deletePieceFromHitPosition(*this, game);
     }
     
     setPosition(oldPosition);

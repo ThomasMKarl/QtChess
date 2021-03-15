@@ -1,5 +1,5 @@
 #include "board/board.h"
-#include "pieces.h"
+#include "piece/static.h"
 
 unsigned long long int qtc::computeThreatenedFields(std::vector<std::string> allMoves)
 {
@@ -96,10 +96,9 @@ void qtc::move(Board &game, std::string desiredMove)
     return;
   }
   
-  game.pieces[from]->move(game,desiredMove);
-  //Move move{game};
-  //move.setDesiredMove(desiredMove);
-  //mpark::visit(move, game.pieces.at(from));
+  Move move{game};
+  move.setDesiredMove(desiredMove);
+  mpark::visit(move, game.pieces.at(from));
 
   ++game.halfMoveCounter;
   game.moveCounter = ceil(game.halfMoveCounter/2.0f);

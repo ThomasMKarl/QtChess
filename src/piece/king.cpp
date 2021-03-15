@@ -1,9 +1,11 @@
-#include "piece/king.h"
+#include "pieces.h"
+#include "board/board.h"
+#include "piece/static.h"
 
   qtc::pc::King::King(Board &game, const unsigned short int position, const bool isWhite)
-    : Piece(position, isWhite)
+    : mPosition(1ULL << position), mWhite(isWhite)
   {
-    setNewPosition(game, game.kingPositions);
+    setNewPosition(*this, game, game.kingPositions);
     
     if(mWhite)
       pathToImage = "img/wking.png";
@@ -22,39 +24,48 @@
 
     const unsigned long long int allPositions =
       game.whitePositions | game.blackPositions;
-    
-    if(mWhite  && game.whiteCanCastleShort &&
-       (0b110 & allPositions) &&
-       !game.whiteIsChecked &&
-       (0b110 & game.threatenedFields))
-      mPossibleMoves |= pow2(g1);
 
-    if(mWhite  && game.whiteCanCastleLong  &&
-       (0b1110000 & allPositions) &&
+    unsigned long long int fieldsBetweenKingAndRook =
+      0b110;
+    if(mWhite  && game.whiteCanCastleShort &&
+       (fieldsBetweenKingAndRook & allPositions) &&
        !game.whiteIsChecked &&
-       (0b1110000 & game.threatenedFields)) 
+       (fieldsBetweenKingAndRook & game.threatenedFields))
+      mPossibleMoves |= pow2(g1);
+    
+    fieldsBetweenKingAndRook =
+      0b1110000;
+    if(mWhite  && game.whiteCanCastleLong  &&
+       (fieldsBetweenKingAndRook & allPositions) &&
+       !game.whiteIsChecked &&
+       (fieldsBetweenKingAndRook & game.threatenedFields)) 
       mPossibleMoves |= pow2(c1);
     
+    fieldsBetweenKingAndRook =
+      0b0000011000000000000000000000000000000000000000000000000000000000;
     if(!mWhite && game.blackCanCastleShort &&
-       (0b0000011000000000000000000000000000000000000000000000000000000000 & allPositions) &&
+       (fieldsBetweenKingAndRook & allPositions) &&
        !game.blackIsChecked &&
-       (0b0000011000000000000000000000000000000000000000000000000000000000 & game.threatenedFields))
+       (fieldsBetweenKingAndRook & game.threatenedFields))
       mPossibleMoves |= pow2(g8);
     
+    fieldsBetweenKingAndRook =
+      0b0111000000000000000000000000000000000000000000000000000000000000;
     if(!mWhite && game.blackCanCastleLong  &&
-       (0b0111000000000000000000000000000000000000000000000000000000000000 & allPositions) &&
+       (fieldsBetweenKingAndRook & allPositions) &&
        !game.blackIsChecked &&
-       (0b0111000000000000000000000000000000000000000000000000000000000000 & game.threatenedFields))
+       (fieldsBetweenKingAndRook & game.threatenedFields))
       mPossibleMoves |= pow2(c8);
 
-    removeIllegalMoves(game);
+    removeIllegalMoves(*this, game);
   }
   
   void qtc::pc::King::move(Board &game, std::string desiredMove)
   {
     const unsigned short int numberMove =
       convertStringToPosition(desiredMove);
-    const unsigned long long int binaryMove = binaryField[numberMove];
+    const unsigned long long int binaryMove =
+      binaryField[numberMove];
     
     if(mWhite)
     {
@@ -67,7 +78,7 @@
       game.blackCanCastleShort = false;
     }
     
-    if(isImpossible(binaryMove))
+    if(isImpossible(*this, binaryMove))
     {
       std::cerr << "impossible move!" << std::endl;
       return;
@@ -75,26 +86,26 @@
 
     correctRook(game, numberMove);
    
-    deletePiece(game, game.kingPositions);     
+    deletePiece(*this, game, game.kingPositions);     
 
-    correctPiecePosition(game, numberMove);
+    correctPiecePosition(*this, game, numberMove);
     
     mPosition = binaryMove;
-    setNewPosition(game, game.kingPositions);
+    setNewPosition(*this, game, game.kingPositions);
 
-    deletePieceFromHitPosition(game);
+    deletePieceFromHitPosition(*this, game);
 
     game.whiteToMove = !game.whiteToMove;
   }
 
-  void qtc::pc::King::correctRook(Board &game, const unsigned short int numberMove)
+void qtc::pc::King::correctRook(Board &game, const unsigned short int numberMove)
   {
     if(numberMove == g1)
     {
       auto extractedPiece = game.pieces.extract(h1);
       extractedPiece.key() = f1;
       game.pieces.insert(std::move(extractedPiece));
-      game.pieces.at(f1)->setPosition(f1);
+      mpark::get<Rook>(game.pieces.at(f1)).setPosition(f1);
       
       game.rookPositions  =  game.rookPositions & ~binaryField[h1];
       game.whitePositions = game.whitePositions & ~binaryField[h1];
@@ -107,7 +118,7 @@
       auto extractedPiece = game.pieces.extract(a1);
       extractedPiece.key() = d1;
       game.pieces.insert(std::move(extractedPiece));
-      game.pieces.at(d1)->setPosition(d1);
+      mpark::get<Rook>(game.pieces.at(d1)).setPosition(d1);
       
        game.rookPositions =  game.rookPositions & ~binaryField[a1];
       game.whitePositions = game.whitePositions & ~binaryField[a1];
@@ -120,7 +131,7 @@
       auto extractedPiece = game.pieces.extract(h8);
       extractedPiece.key() = f8;
       game.pieces.insert(std::move(extractedPiece));
-      game.pieces.at(f8)->setPosition(f8);
+      mpark::get<Rook>(game.pieces.at(f8)).setPosition(f8);
       
       game.rookPositions  =  game.rookPositions & ~binaryField[h8];
       game.blackPositions = game.blackPositions & ~binaryField[h8];
@@ -133,7 +144,7 @@
       auto extractedPiece = game.pieces.extract(a8);
       extractedPiece.key() = d8;
       game.pieces.insert(std::move(extractedPiece));
-      game.pieces.at(d8)->setPosition(d8);
+      mpark::get<Rook>(game.pieces.at(d8)).setPosition(d8);
       
       game.rookPositions  =  game.rookPositions & ~binaryField[a8];
       game.blackPositions = game.blackPositions & ~binaryField[a8];

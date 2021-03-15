@@ -5,3 +5,5 @@ doc/latex
 *#
 include/mpark
 .qmake.stash
+*.o
+*copy*

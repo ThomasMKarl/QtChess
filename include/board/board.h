@@ -5,6 +5,8 @@
 #include "stdlib.h"
 #include "def.h"
 
+#include "pieces.h"
+
 namespace qtc {
 
 unsigned long long int pow2(const unsigned short int);
@@ -20,7 +22,6 @@ void FENerror(const short int errorCode,
 unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);
 
 namespace pc {
-class Piece;
 class Pawn;
 class Knight;
 class Bishop;
@@ -28,9 +29,16 @@ class Queen;
 class King;
 class Rook;
 };
-using Pieces = std::map<unsigned short int, std::shared_ptr<pc::Piece>>;
-//using Piece = mpark::variant<Pawn,Knight,Bishop,Rook,Queen,King>;
-//using Pieces = std::map<unsigned short int, Piece>;
+//using Pieces = std::map<unsigned short int, std::shared_ptr<pc::Piece>>;
+using Piece  = mpark::variant< pc::Pawn
+			       ,pc::Knight
+			       ,pc::Bishop
+			       ,pc::Rook
+			       ,pc::Queen
+			       ,pc::King
+			      >;
+using Pieces = std::map<unsigned short int,
+			Piece>;
 
 class Board
 {
@@ -43,7 +51,7 @@ class Board
     for(unsigned short int field = h7; field <= a7; field++)
       createPiece<pc::Pawn>(field, black);
     
-    createPiece<pc::Rook  >(h8, black);
+    /*createPiece<pc::Rook  >(h8, black);
     createPiece<pc::Knight>(g8, black);
     createPiece<pc::Bishop>(f8, black);
     createPiece<pc::King  >(e8, black);
@@ -66,7 +74,7 @@ class Board
     createPiece<pc::Queen >(d1, white);
     createPiece<pc::Bishop>(c1, white);
     createPiece<pc::Knight>(b1, white);
-    createPiece<pc::Rook  >(a1, white);
+    createPiece<pc::Rook  >(a1, white);*/
   };
 
   explicit Board(std::string FENposition)

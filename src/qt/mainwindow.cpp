@@ -32,14 +32,46 @@ qtc::qt::MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
   
   refresh(board);
 }
-
+  
 void qtc::qt::MainWindow::refresh(const Board &board)
 {
   Pixel coordinate{};
   std::unique_ptr<QImage> imageObject = std::make_unique<QImage>();
+  std::string pathToImage{};
   for(const auto& [position, piece] : board.pieces)
   {
-    imageObject->load(QString::fromStdString(piece->pathToImage));
+    if(const auto p = std::get_if<qtc::pc::Bishop>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[6];
+      else          pathToImage = pieceImages[0];;
+    }
+    if(const auto p = std::get_if<qtc::pc::King>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[7];
+      else          pathToImage = pieceImages[1];;
+    }
+    if(const auto p = std::get_if<qtc::pc::Knight>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[8];
+      else          pathToImage = pieceImages[2];;
+    }
+    if(const auto p = std::get_if<qtc::pc::Pawn>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[9];
+      else          pathToImage = pieceImages[3];;
+    }
+    if(const auto p = std::get_if<qtc::pc::Queen>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[10];
+      else          pathToImage = pieceImages[4];;
+    }
+    if(const auto p = std::get_if<qtc::pc::Rook>(&piece))
+    {
+      if(p.isWhite) pathToImage = pieceImages[11];
+      else          pathToImage = pieceImages[5];;
+    }
+    
+    imageObject->load(QString::fromStdString(pathToImage));
     coordinate = PosToPix(position, offset, fieldSize);
     
     QPixmap temp = QPixmap::fromImage(*imageObject.get());

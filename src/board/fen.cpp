@@ -1,5 +1,5 @@
 #include "board/board.h"
-#include "pieces.h"
+#include "piece/static.h"
 
   short int qtc::Board::createPiecesFromFEN(std::string FENsection)
   {

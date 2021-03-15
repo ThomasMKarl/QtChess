@@ -1,16 +1,15 @@
 #include "board/board.h"
-#include "pieces.h"
+#include "piece/static.h"
 
   template<typename T>
-  void qtc::Board::createPiece(const unsigned short int position,
-			       const bool isWhite)
+  void qtc::Board::createPiece(const unsigned short int position, const bool isWhite)
   {
-    pieces.insert({position, std::make_shared<T>(*this,position,isWhite)});
-    //pieces.insert({position, T{*this,position,isWhite}});
+    //pieces.insert({position, std::make_shared<T>(*this,position,isWhite)});
+    pieces.insert({position, T{*this,position,isWhite}});
   }
   template void qtc::Board::createPiece<qtc::pc::Pawn>
     (const unsigned short int position, const bool isWhite);
-  template void qtc::Board::createPiece<qtc::pc::Knight>
+/*template void qtc::Board::createPiece<qtc::pc::Knight>
     (const unsigned short int position, const bool isWhite);
   template void qtc::Board::createPiece<qtc::pc::Bishop>
     (const unsigned short int position, const bool isWhite);
@@ -19,7 +18,7 @@
   template void qtc::Board::createPiece<qtc::pc::Queen>
     (const unsigned short int position, const bool isWhite);
   template void qtc::Board::createPiece<qtc::pc::King>
-    (const unsigned short int position, const bool isWhite);
+  (const unsigned short int position, const bool isWhite);*/
 
   bool qtc::Board::operator==(const Board &rhs) const
   {
@@ -85,7 +84,7 @@
     std::cout << "\nBlack:   "   << blackBits << '\n';
   }
 
-  bool qtc::Board::positionsMatchWithPieces() const
+/*bool qtc::Board::positionsMatchWithPieces() const
   {
     for(const auto& [position, piece] : pieces)
     {
@@ -98,24 +97,21 @@
     }
 
     return true;
-  }
+    }*/
 
   std::vector<std::string> qtc::Board::generateWhiteMoves() 
   {
     std::vector<std::string> whiteMoves{};
     
-    //MoveGen moveGen{*this}
+    qtc::MoveGenerator moveGen{*this};
     
     for(const auto& [position, piece] : pieces)
     {
-        if(piece->isWhite())
+        if(binaryField[position] & whitePositions)
         {
-	  piece->movegen(*this);
-	  const std::vector<std::string> moves =
-	    piece->computePossibleMoves();
-	  //std::visit(moveGen,piece);
-	  //std::vector<std::string> moves =
-	  //  piece.get()->computePossibleMoves();
+	  mpark::visit(moveGen,piece);
+	  std::vector<std::string> moves =
+	    moveGen.getPossibleMoves();
 	  std::copy(moves.begin(), moves.end(), whiteMoves.end());
         }
     }
@@ -127,18 +123,15 @@
   {
     std::vector<std::string> blackMoves{};
     
-    //MoveGen moveGen{*this}
+    qtc::MoveGenerator moveGen{*this};
     
     for(const auto& [position, piece] : pieces)
     {
-        if(!piece->isWhite())
+        if(binaryField[position] & blackPositions)
         {
-	  piece->movegen(*this);
-	  const std::vector<std::string> moves =
-	    piece->computePossibleMoves();
-	  //mpark::visit(moveGen,piece);
-	  //std::vector<std::string> moves =
-	  //  piece.get()->computePossibleMoves();
+	  mpark::visit(moveGen,piece);
+	  std::vector<std::string> moves =
+	    moveGen.getPossibleMoves();
 	  std::copy(moves.begin(), moves.end(), blackMoves.end());
         }
     }
@@ -193,3 +186,4 @@
     
     return possibleMoves;
   }
+
