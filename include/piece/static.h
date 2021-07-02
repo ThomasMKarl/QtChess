@@ -35,7 +35,24 @@ struct Move
   std::shared_ptr<Board> boardResource{};
   std::string move_{};
 };
-
+  
+struct EPsetter
+{
+  EPsetter(bool left_) : left(left_) {}
+  
+  template<typename T>
+  void operator()(T& piece) const {auto help = piece;}
+  void operator()(qtc::pc::Pawn& pawn) const
+  {
+    if(left)
+      pawn.setCanHitEpLeft();
+    else
+      pawn.setCanHitEpRight();
+  }
+  
+ private:
+  bool left{};
+};
 
 namespace pc {
 
@@ -64,47 +81,50 @@ namespace pc {
   template <typename T>
   void setNewPosition(const T& piece, Board &game, unsigned long long int &positions)
   {
-    positions |= piece.getPosition();
+    unsigned long long int newPosition = binaryField[piece.getPosition()];
+    positions |= newPosition;
     
     if(piece.isWhite())
-      game.whitePositions |= piece.getPosition();
+      game.whitePositions |= newPosition;
     else
-      game.blackPositions |= piece.getPosition();
+      game.blackPositions |= newPosition;
   }
   
   template <typename T>
   void deletePiece(const T& piece, Board &game, unsigned long long int &positions)
   {
-    positions &= ~piece.getPosition();
+    unsigned long long int oldPosition = binaryField[piece.getPosition()];
+    positions &= ~oldPosition;
     
     if(piece.isWhite())
-      game.whitePositions &= ~piece.getPosition();
+      game.whitePositions &= ~oldPosition;
     else
-      game.blackPositions &= ~piece.getPosition();
+      game.blackPositions &= ~oldPosition;
   }
   
   template <typename T>
   void deletePieceFromHitPosition(const T& piece, Board &game)
   {
-    game.pawnPositions   &= ~piece.getPosition();
-    game.knightPositions &= ~piece.getPosition();
-    game.bishopPositions &= ~piece.getPosition();
-    game.rookPositions   &= ~piece.getPosition();
-    game.queenPositions  &= ~piece.getPosition();
+    unsigned long long int oldPosition = binaryField[piece.getPosition()];
+    game.pawnPositions   &= ~oldPosition;
+    game.knightPositions &= ~oldPosition;
+    game.bishopPositions &= ~oldPosition;
+    game.rookPositions   &= ~oldPosition;
+    game.queenPositions  &= ~oldPosition;
     
-    game.whitePositions  &= ~piece.getPosition();
-    game.blackPositions  &= ~piece.getPosition();
+    game.whitePositions  &= ~oldPosition;
+    game.blackPositions  &= ~oldPosition;
   }
   
   template <typename T>
-  bool shiftMovesBlocked(const T& piece, const Board &game, const unsigned long long int shift)
+  bool shiftMovesBlocked(T& piece, const Board &game, const unsigned long long int shift)
   {
     if( piece.isWhite() && (shift & game.whitePositions) != 0)
       return true;
       
     if( piece.isWhite() && (shift & game.blackPositions) != 0)
     {
-      piece.setPosition( piece.getPossibleMoves() | shift );
+      piece.setPossibleMoves( piece.getPossibleMoves() | shift );
       return true;
     }
 
@@ -113,11 +133,11 @@ namespace pc {
       
     if(!piece.isWhite() && (shift & game.whitePositions) != 0)
     {
-      piece.setPosition( piece.getPossibleMoves() | shift );
+      piece.setPossibleMoves( piece.getPossibleMoves() | shift );
       return true;
     }
     
-    piece.setPosition( piece.getPossibleMoves() | shift );
+    piece.setPossibleMoves( piece.getPossibleMoves() | shift );
     return false;
   }
   
@@ -144,13 +164,15 @@ namespace pc {
 
     Move move{game};
 
+    std::bitset<64> pawnBits(piece.getPossibleMoves());
+    std::cout << pawnBits;
+
     for(unsigned short int b = 0; b < 64; b++)
     {
       if(bit[b] == 1)
       {
 	Board gameCopy = game;
-        //gameCopy.pieces.at(oldPosition)->move( gameCopy,fieldMap[b] );
-	
+
 	move.setDesiredMove(fieldMap[b]);
 	mpark::visit(move, gameCopy.pieces.at( oldPosition ));
         if(piece.isWhite())
@@ -173,9 +195,6 @@ namespace pc {
 	}
       }
     }
-    std::bitset<64> pawnBits(piece.getPossibleMoves());
-    std::cout << pawnBits;exit(1);
-    exit(1);
 
     piece.setPossibleMoves(bit.to_ullong());
   }

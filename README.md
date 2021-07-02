@@ -1,4 +1,4 @@
-#QtChess (Beta)
+# QtChess (Beta)
 
 ## Requirements
 

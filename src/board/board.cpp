@@ -4,12 +4,11 @@
   template<typename T>
   void qtc::Board::createPiece(const unsigned short int position, const bool isWhite)
   {
-    //pieces.insert({position, std::make_shared<T>(*this,position,isWhite)});
     pieces.insert({position, T{*this,position,isWhite}});
   }
   template void qtc::Board::createPiece<qtc::pc::Pawn>
     (const unsigned short int position, const bool isWhite);
-/*template void qtc::Board::createPiece<qtc::pc::Knight>
+  template void qtc::Board::createPiece<qtc::pc::Knight>
     (const unsigned short int position, const bool isWhite);
   template void qtc::Board::createPiece<qtc::pc::Bishop>
     (const unsigned short int position, const bool isWhite);
@@ -18,7 +17,7 @@
   template void qtc::Board::createPiece<qtc::pc::Queen>
     (const unsigned short int position, const bool isWhite);
   template void qtc::Board::createPiece<qtc::pc::King>
-  (const unsigned short int position, const bool isWhite);*/
+    (const unsigned short int position, const bool isWhite);
 
   bool qtc::Board::operator==(const Board &rhs) const
   {
@@ -44,6 +43,9 @@
     if(blackIsChecked   != rhs.blackIsChecked)   return false;
     if(blackIsCheckmate != rhs.blackIsCheckmate) return false;
     if(blackIsStalemate != rhs.blackIsStalemate) return false;
+
+    if(movesSinceHit   != rhs.movesSinceHit)   return false;
+    if(halfMoveCounter != rhs.halfMoveCounter) return false;
        
     return true;
   }
@@ -104,8 +106,8 @@
     std::vector<std::string> whiteMoves{};
     
     qtc::MoveGenerator moveGen{*this};
-    
-    for(const auto& [position, piece] : pieces)
+
+    for(auto& [position, piece] : pieces)
     {
         if(binaryField[position] & whitePositions)
         {
@@ -124,8 +126,8 @@
     std::vector<std::string> blackMoves{};
     
     qtc::MoveGenerator moveGen{*this};
-    
-    for(const auto& [position, piece] : pieces)
+
+    for(auto& [position, piece] : pieces)
     {
         if(binaryField[position] & blackPositions)
         {

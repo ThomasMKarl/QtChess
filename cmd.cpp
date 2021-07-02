@@ -4,19 +4,19 @@ using namespace qtc;
 
 int main(int argc, char* argv[])
 {
-  if(argc > 2) std::cerr << "Usage: " << argv[0] << " \"<FEN String>\"\n";
-
-  if(argc = 2) Board board = Board::createBoardFromFEN(argv[1]);
-  else         Board board = Board::newgame();
+  if(argc  > 2) std::cerr << "Usage: " << argv[0] << " \"<FEN String>\"\n";
+  
+  Board board = Board::newgame();
+  if(argc == 2) board = Board::createBoardFromFEN(argv[1]);
   
   while(true)
-  {/*
+  {
     std::cout << "         ## Position after "
 	      << board.moveCounter << " moves ##\n";
     
-    board.printPositionsBinary();
+    board.printPositionsBinary();exit(1);
     
-    board.update();
+    /*board.update();
     if(isMate(board))      break;
     if(isStalemate(board)) break;
     

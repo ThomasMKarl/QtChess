@@ -136,21 +136,24 @@
   {
     unsigned short int epPosition =
       getOriginFieldNumber(FENsection);
-      
+
+    bool left{true};
+    bool right{false};
+    qtc::EPsetter setLeft{left};
+    qtc::EPsetter setRight{right};
     if( whiteToMove && (epPosition <= 47 || epPosition >= 40))//row 7
     {
-    if(pawnPositions & binaryField[epPosition+9])
-      pieces.at(epPosition+9)->setCanHitEpLeft();
-    if(pawnPositions & binaryField[epPosition+7])
-      pieces.at(epPosition+7)->setCanHitEpRight();
-    }
-      
+      if(pawnPositions & binaryField[epPosition+9])
+	mpark::visit( setLeft,  pieces.at(epPosition+9) );
+      if(pawnPositions & binaryField[epPosition+7])
+        mpark::visit( setRight, pieces.at(epPosition+7) );
+    }     
     if(!whiteToMove && (epPosition <= 23 || epPosition >= 16))//row 3
     {
       if(pawnPositions & binaryField[epPosition-7])
-	pieces.at(epPosition-7)->setCanHitEpLeft();
+	mpark::visit( setLeft,  pieces.at(epPosition-7) );
       if(pawnPositions & binaryField[epPosition-9])
-        pieces.at(epPosition-9)->setCanHitEpRight();
+        mpark::visit( setRight, pieces.at(epPosition-9) );
     }
   }
 
@@ -277,6 +280,7 @@
     return FENstring;
   }
 
+#ifdef USE_MPI
   MPI_Request qtc::Board::sendFENtoNode(const int destination,
 					const MPI_Comm communicator) const
   {
@@ -327,3 +331,11 @@ void qtc::FENerror(const short int errorCode, const MPI_Comm communicator)
 {
   if(errorCode) MPI_Abort(communicator, errorCode);
 }
+#endif
+
+#ifndef USE_MPI
+void qtc::FENerror(const short int errorCode)
+{
+  if(errorCode) exit(errorCode);
+}
+#endif

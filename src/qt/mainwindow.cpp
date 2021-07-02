@@ -32,7 +32,23 @@ qtc::qt::MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
   
   refresh(board);
 }
-  
+
+std::array<std::string,12> pieceImages = {
+  "img/bbishop.png",
+  "img/bking.png",
+  "img/bknight.png",
+  "img/bpawn.png",
+  "img/bqueen.png",
+  "img/brook.png",
+
+  "img/wbishop.png",
+  "img/wking.png",
+  "img/wknight.png",
+  "img/wpawn.png",
+  "img/wqueen.png",
+  "img/wrook.png"
+};
+
 void qtc::qt::MainWindow::refresh(const Board &board)
 {
   Pixel coordinate{};
@@ -40,35 +56,47 @@ void qtc::qt::MainWindow::refresh(const Board &board)
   std::string pathToImage{};
   for(const auto& [position, piece] : board.pieces)
   {
-    if(const auto p = std::get_if<qtc::pc::Bishop>(&piece))
+    auto help1 = mpark::get_if<qtc::pc::Bishop>(&piece);
+    if(help1)
     {
-      if(p.isWhite) pathToImage = pieceImages[6];
-      else          pathToImage = pieceImages[0];;
+      if(help1->isWhite()) pathToImage = pieceImages[6];
+      else                 pathToImage = pieceImages[0];
+      break;
     }
-    if(const auto p = std::get_if<qtc::pc::King>(&piece))
+    auto help2 = mpark::get_if<qtc::pc::King>(&piece);
+    if(help2)
     {
-      if(p.isWhite) pathToImage = pieceImages[7];
-      else          pathToImage = pieceImages[1];;
+      if(help2->isWhite()) pathToImage = pieceImages[7];
+      else                 pathToImage = pieceImages[1];
+      break;
     }
-    if(const auto p = std::get_if<qtc::pc::Knight>(&piece))
+    auto help3 = mpark::get_if<qtc::pc::Knight>(&piece);
+    if(help3)
     {
-      if(p.isWhite) pathToImage = pieceImages[8];
-      else          pathToImage = pieceImages[2];;
+      if(help3->isWhite()) pathToImage = pieceImages[8];
+      else                 pathToImage = pieceImages[2];
+      break;
     }
-    if(const auto p = std::get_if<qtc::pc::Pawn>(&piece))
+    auto help4 = mpark::get_if<qtc::pc::Pawn>(&piece);
+    if(help4)
     {
-      if(p.isWhite) pathToImage = pieceImages[9];
-      else          pathToImage = pieceImages[3];;
+      if(help4->isWhite()) pathToImage = pieceImages[9];
+      else                 pathToImage = pieceImages[3];
+      break;
     }
-    if(const auto p = std::get_if<qtc::pc::Queen>(&piece))
+    auto help5 = mpark::get_if<qtc::pc::Queen>(&piece);
+    if(help5)
     {
-      if(p.isWhite) pathToImage = pieceImages[10];
-      else          pathToImage = pieceImages[4];;
+      if(help5->isWhite()) pathToImage = pieceImages[10];
+      else                 pathToImage = pieceImages[4];
+      break;
     }
-    if(const auto p = std::get_if<qtc::pc::Rook>(&piece))
+    auto help6 = mpark::get_if<qtc::pc::Rook>(&piece);
+    if(help6)
     {
-      if(p.isWhite) pathToImage = pieceImages[11];
-      else          pathToImage = pieceImages[5];;
+      if(help6->isWhite()) pathToImage = pieceImages[11];
+      else                 pathToImage = pieceImages[5];
+      break;
     }
     
     imageObject->load(QString::fromStdString(pathToImage));

@@ -2,16 +2,11 @@
 #include "board/board.h"
 #include "piece/static.h"
 
-  qtc::pc::Queen::Queen(Board &game, const unsigned short int position, const bool isWhite)
-    : mPosition(1ULL << position), mWhite(isWhite)
-  {
-    setNewPosition(*this, game, game.queenPositions);
-    
-    if(mWhite)
-      pathToImage = "img/wqueen.png";
-    else
-      pathToImage = "img/bqueen.png";
-  }
+  qtc::pc::Queen::Queen(Board &game,
+			const unsigned short int position,
+			const bool isWhite)
+    : mPosition(1ULL << position),
+      mWhite(isWhite) {setNewPosition(*this, game, game.queenPositions);}
   
   void qtc::pc::Queen::movegen(const Board &game)
   {

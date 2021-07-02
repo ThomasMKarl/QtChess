@@ -2,26 +2,20 @@
 #include "board/board.h"
 #include "piece/static.h"
 
-  qtc::pc::Rook::Rook(Board &game, const unsigned short int position, const bool isWhite)
-    : mPosition(1ULL << position), mWhite(isWhite)
-  {
-    setNewPosition(*this, game, game.rookPositions);
-    
-    if(mWhite)
-      pathToImage = "img/wrook.png";
-    else
-      pathToImage = "img/brook.png";
-  };
+  qtc::pc::Rook::Rook(Board &game,
+		      const unsigned short int position,
+		      const bool isWhite)
+    : mPosition(1ULL << position),
+      mWhite(isWhite) {setNewPosition(*this, game, game.rookPositions);}
 
   void qtc::pc::Rook::movegen(const Board &game)
-  {    
+  {
     const unsigned short int position = log2(mPosition);
 
     unsigned long long int upperStep;
     for(unsigned short int i = 0; i < rookMoveTable.upper[position]; i++)
     {
       upperStep = mPosition << 8*(i+1);
-
       if(shiftMovesBlocked(*this, game, upperStep)) break;
     }
 

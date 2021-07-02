@@ -5,15 +5,8 @@
   qtc::pc::Bishop::Bishop(qtc::Board &game,
 			  const unsigned short int position,
 			  const bool isWhite)
-    : mPosition(1ULL << position), mWhite(isWhite)
-  { 
-    setNewPosition(*this, game, game.bishopPositions);
-    
-    if(mWhite)
-      pathToImage = "img/wbishop.png";
-    else
-      pathToImage = "img/bbishop.png";
-  }
+    : mPosition(1ULL << position),
+      mWhite(isWhite) {setNewPosition(*this, game, game.bishopPositions);}
 
   void qtc::pc::Bishop::movegen(const qtc::Board &game)
   {

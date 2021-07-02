@@ -7,15 +7,7 @@
       mWhite(isWhite),
       hasMoved(false),
       canHitEpLeft(false),
-      canHitEpRight(false)
-  {
-    setNewPosition(*this, game, game.pawnPositions);
-    
-    if(mWhite)
-      pathToImage = "img/wpawn.png";
-    else
-      pathToImage = "img/bpawn.png";
-  }
+      canHitEpRight(false) {setNewPosition(*this, game, game.pawnPositions);}
 
   void qtc::pc::Pawn::movegen(const Board &game)
   {

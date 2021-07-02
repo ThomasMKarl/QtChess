@@ -1,7 +1,9 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#ifdef USE_MPI
 #include "mpi.h"
+#endif
 #include "stdlib.h"
 #include "def.h"
 
@@ -14,11 +16,16 @@ std::vector<std::string> explode(std::string string,
 				 const std::string delimiter = " ");
 bool kingPositionsCorrect(const unsigned short int whiteKingPosition,
 			  const unsigned short int blackKingPosition);
-unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);
+unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);  
+#ifdef USE_MPI
 std::string receiveFENfromNode(const int source = 0,
 			       const MPI_Comm communicator = MPI_COMM_WORLD);
 void FENerror(const short int errorCode,
 	      const MPI_Comm communicator = MPI_COMM_WORLD);
+#endif
+#ifndef USE_MPI
+void FENerror(const short int errorCode);
+#endif
 unsigned long long int computeThreatenedFields(std::vector<std::string> allMoves);
 
 namespace pc {
@@ -29,16 +36,9 @@ class Queen;
 class King;
 class Rook;
 };
-//using Pieces = std::map<unsigned short int, std::shared_ptr<pc::Piece>>;
-using Piece  = mpark::variant< pc::Pawn
-			       ,pc::Knight
-			       ,pc::Bishop
-			       ,pc::Rook
-			       ,pc::Queen
-			       ,pc::King
-			      >;
-using Pieces = std::map<unsigned short int,
-			Piece>;
+
+using Piece  = mpark::variant<pc::Pawn, pc::Knight, pc::Bishop, pc::Rook, pc::Queen, pc::King>;
+using Pieces = std::map<unsigned short int, Piece>;
 
 class Board
 {
@@ -59,14 +59,14 @@ class Board
     createPiece<pc::Bishop>(c8, black);
     createPiece<pc::Knight>(b8, black);
     createPiece<pc::Rook  >(a8, black);
-  
+    
     //////////////////////////////////////////////////
     
     const bool white = true;
   
     for(unsigned short int field = h2; field <= a2; field++)
       createPiece<pc::Pawn>(field, white);
-  
+
     createPiece<pc::Rook  >(h1, white);
     createPiece<pc::Knight>(g1, white);
     createPiece<pc::Bishop>(f1, white);
@@ -139,7 +139,8 @@ class Board
 
     return game;
   }
-
+  
+#ifdef USE_MPI
   static Board createBoardFromNode(const int source = 0,
 				   const MPI_Comm communicator = MPI_COMM_WORLD)
   { 
@@ -147,6 +148,7 @@ class Board
      receiveFENfromNode(source, communicator)
     );
   }
+#endif
   
   template<typename T>
   void createPiece(unsigned short int position, bool isWhite);
@@ -167,8 +169,11 @@ class Board
   void             setEpFromFEN(std::string FENsection) const;
   std::string computePiecesFEN() const ;
   std::string computeFENposition() const;
+  
+#ifdef USE_MPI
   MPI_Request sendFENtoNode(const int destination,
 			    const MPI_Comm communicator = MPI_COMM_WORLD) const;
+#endif
   
   bool whiteToMove{true};
 

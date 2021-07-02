@@ -40,7 +40,7 @@ DISTNAME      = qtchess1.0.0
 DISTDIR = /mnt/Windows/Users/Administrator/Documents/GitHub/QtChess/.tmp/qtchess1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread  -L/usr/lib/openmpi -lmpi_cxx -lmpi -lgomp 
+LIBS          = $(SUBLIBS) /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread  -lgomp -L/usr/lib/openmpi -lmpi_cxx -lmpi 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -388,7 +388,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/qt_config.prf \
 		/usr/lib/qt/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/qt/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		/usr/lib/qt/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/qt/mkspecs/features/toolchain.prf \
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
@@ -410,7 +409,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
 		QtChess.pro include/qt/mainwindow.h \
 		include/board/board.h \
-		include/piece/piece.h \
+		include/piece/static.h \
 		include/piece/pawn.h \
 		include/piece/knight.h \
 		include/piece/bishop.h \
@@ -751,7 +750,6 @@ Makefile_qt: QtChess.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mk
 		/usr/lib/qt/mkspecs/features/qt_config.prf \
 		/usr/lib/qt/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/qt/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		/usr/lib/qt/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/qt/mkspecs/features/toolchain.prf \
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
@@ -1086,7 +1084,6 @@ Makefile_qt: QtChess.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mk
 /usr/lib/qt/mkspecs/features/qt_config.prf:
 /usr/lib/qt/mkspecs/linux-g++/qmake.conf:
 /usr/lib/qt/mkspecs/features/spec_post.prf:
-.qmake.stash:
 /usr/lib/qt/mkspecs/features/exclusive_builds.prf:
 /usr/lib/qt/mkspecs/features/toolchain.prf:
 /usr/lib/qt/mkspecs/features/default_pre.prf:
@@ -1122,7 +1119,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/qt/mainwindow.h include/board/board.h include/piece/piece.h include/piece/pawn.h include/piece/knight.h include/piece/bishop.h include/piece/rook.h include/piece/queen.h include/piece/king.h $(DISTDIR)/
+	$(COPY_FILE) --parents include/qt/mainwindow.h include/board/board.h include/piece/static.h include/piece/pawn.h include/piece/knight.h include/piece/bishop.h include/piece/rook.h include/piece/queen.h include/piece/king.h $(DISTDIR)/
 	$(COPY_FILE) --parents qt.cpp src/qt/mainwindow.cpp src/board/board.cpp src/board/fen.cpp src/board/help.cpp src/piece/pawn.cpp src/piece/knight.cpp src/piece/bishop.cpp src/piece/rook.cpp src/piece/queen.cpp src/piece/king.cpp $(DISTDIR)/
 
 

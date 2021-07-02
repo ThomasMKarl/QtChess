@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qtchess
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++17 -O3 -I include -fopenmp -Wl,-rpath -Wl,/usr/lib/openmpi -Wl,--enable-new-dtags
-QMAKE_LIBS += -L/usr/lib/openmpi -lmpi_cxx -lmpi -lgomp
+QMAKE_LIBS += -lgomp -L/usr/lib/openmpi -lmpi_cxx -lmpi
 
 SOURCES +=  qt.cpp                   \
             src/qt/mainwindow.cpp    \ 
@@ -27,7 +27,7 @@ SOURCES +=  qt.cpp                   \
 
 HEADERS  += include/qt/mainwindow.h    \
             include/board/board.h      \        
-            include/piece/piece.h      \
+            include/piece/static.h     \
             include/piece/pawn.h       \
             include/piece/knight.h     \
             include/piece/bishop.h     \
