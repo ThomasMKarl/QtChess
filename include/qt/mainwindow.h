@@ -44,10 +44,9 @@ class MainWindow : public QMainWindow
   Pixel offset{20,20};
   double fieldSize{80};
   
-  //std::shared_ptr<QLabel> label;
-  std::shared_ptr<QGraphicsScene> scene;
+  std::shared_ptr<QGraphicsScene> scene{};
 
-  QTransform trafo;
+  QTransform trafo{};
 
   std::array<std::string,12> pieceImages = {
   "img/bbishop.png",

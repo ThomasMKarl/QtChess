@@ -164,9 +164,6 @@ namespace pc {
 
     Move move{game};
 
-    std::bitset<64> pawnBits(piece.getPossibleMoves());
-    std::cout << pawnBits;
-
     for(unsigned short int b = 0; b < 64; b++)
     {
       if(bit[b] == 1)

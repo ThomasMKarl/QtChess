@@ -1,12 +1,12 @@
 #include "qt/mainwindow.h"
 
 qtc::qt::MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
-{  
+{
   Board board = Board::newgame();
   
   setWindowTitle("QtChess Board");
 
-  scene = std::make_shared<QGraphicsScene>(this);
+  scene = std::make_shared<QGraphicsScene>();
   const QPen blackPen("black");
   QBrush blackBrush("black");
   QBrush whiteBrush("white");
